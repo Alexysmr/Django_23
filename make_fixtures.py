@@ -2,6 +2,7 @@ import subprocess
 import sys
 import os
 
+# Создание фикстур
 
 fixtures_dir = os.path.join('catalog', 'fixtures')
 os.makedirs(fixtures_dir, exist_ok=True)
