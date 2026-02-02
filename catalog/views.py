@@ -33,7 +33,7 @@ def contacts(request) -> HttpResponse:
             <div class="container mt-4">
                 <a href="/" class="btn btn-primary">Каталог</a>
                 <a href="/contacts/" class="btn btn-primary">Контакты</a>
-                <h3>Спасибо, {name.name()}! Ваше сообщение \"{message}\" получено.</h3>
+                <h3>Спасибо, {name}! Ваше сообщение \"{message}\" получено.</h3>
             </div>
         </body>
         </html>
