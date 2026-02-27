@@ -1,0 +1,23 @@
+{% extends 'catalog/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">{{ product.name }}</h1>
+    <div class="card">
+        <div class="card-body">
+            <p><strong>Категория:</strong> {{ product.category.name }}</p>
+            <p><strong>Цена:</strong> {{ product.price }} руб.</p>
+            <p><strong>Описание:</strong> {{ product.description }}</p>
+            {% if product.image %}
+                <img src="{{ product.image_thumbnail.url }}" class="card-img-top" alt="{{ product.name }}"
+                        style="width: 500px; height: auto;">
+                {% else %}
+                    <img src="/static/no_image.png" class="card-img-top" alt="">
+            {% endif %}
+            <p></p>
+            <p><small>Добавлено: {{ product.created_at|date:"d.m.Y H:i" }}</small>,
+            <small>Обновлено: {{ product.updated_at|date:"d.m.Y H:i" }}</small></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

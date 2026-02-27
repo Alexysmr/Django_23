@@ -1,4 +1,7 @@
 from django.db import models
+from imagekit.models import ImageSpecField
+from imagekit.processors import ResizeToFill
+from numpy.f2py.crackfortran import verbose
 
 
 class Category(models.Model):
@@ -21,6 +24,13 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    image_thumbnail = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(300, 300)],
+        format='JPEG',
+        options={'quality': 85}
+    )
+
 
     def __str__(self):
         return f'{self.name} - {self.price} руб., {self.category}'
@@ -31,6 +41,7 @@ class Product(models.Model):
 
 class Contact(models.Model):
     name = models.CharField(max_length=100, verbose_name='Имя')
+    phone = models.CharField(max_length=17, blank=True, null=False, verbose_name='Телефон')
     email = models.EmailField(verbose_name='Email')
     message = models.TextField(verbose_name='Сообщение')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата отправки')

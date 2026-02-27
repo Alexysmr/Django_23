@@ -1,0 +1,32 @@
+{% extends 'catalog/base.html' %}
+
+{% block content %}
+<div class="row text-center">
+    <h3>Последние добавленные товары:</h3>
+    {% for product in last_products %}
+        <div class="col-3">
+            <div class="card mb-4 box-shadow">
+                {% if product.image %}
+                    <img src="{{ product.image_thumbnail.url }}" class="card-img-top" alt="{{ product.name }}"
+                        style="height: 250px; object-fit: cover;">
+                {% else %}
+                    <img src="/static/no_image.png" class="card-img-top" alt="">
+                {% endif %}
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">{{ product.name }}</h4>
+                </div>
+                <div class="card-body">
+                    <h2 class="card-title pricing-card-title">{{ product.price }} руб.</h2>
+                    <p>{{ product.description|truncatechars:100 }}</p>
+                    <small>Категория: {{ product.category.name }}</small>
+                    <p>
+                    <a href="{% url 'product_details' product.id %}" class="btn btn-lg btn-block btn-outline-primary">Подробнее</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <p>Пока нет товаров.</p>
+    {% endfor %}
+</div>
+{% endblock %}

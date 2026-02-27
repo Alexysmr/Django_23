@@ -1,0 +1,25 @@
+<nav class="ms-5">
+    {% if request.path == '/' %}
+    <span class="p-2 btn btn-secondary disabled">Каталог</span>
+    {% else %}
+    <a class="p-2 btn btn-outline-primary" href="/">Каталог</a>
+    {% endif %}
+
+    {% if request.path == '/contacts/' %}
+        <span class="p-2 btn btn-secondary disabled">Контакты</span>
+    {% else %}
+        <a class="p-2 btn btn-outline-primary" href="/contacts/">Контакты</a>
+    {% endif %}
+
+    {% if request.path == '/add-product/' %}
+    <span class="p-2 btn btn-secondary disabled">Добавить товар</span>
+    {% else %}
+    <a class="p-2 btn btn-outline-primary" href="/add-product/">Добавить товар</a>
+    {% endif %}
+
+    {% if request.path == '/added_products/' %}
+        <span class="p-2 btn btn-secondary disabled">Последние 5 добавленных товаров</span>
+    {% else %}
+        <a class="p-2 btn btn-outline-primary" href="/added_products/">Последние 5 добавленных товаров</a>
+    {% endif %}
+</nav>
