@@ -1,94 +1,101 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, Http404
-from django.core.paginator import Paginator
-
+from django.shortcuts import render, get_object_or_404
+from django.http import Http404
+from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic.edit import FormView
+from django.urls import reverse_lazy
 from catalog.models import Product, Contact, Category
-from .forms import ProductForm
+from .forms import ProductForm, ContactForm
 
 
-def index(request) -> HttpResponse:
-    """Отработка и рендеринг запроса GET главной страницы с отображением списка продуктов"""
-    all_products = Product.objects.all()
-    paginator = Paginator(all_products, 3)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    context = {
-        'page_obj': page_obj,
-    }
-    return render(request, 'catalog/index.html', context)
+class IndexView(ListView):
+    model = Product
+    template_name = 'catalog/index.html'
+    context_object_name = 'products'
+    paginate_by = 3
+
+    def get_queryset(self):
+        # Метод можно не добавлять, но в случае возникновения необходимости предварительной обработки пригодится
+        return Product.objects.all().order_by('created_at')
 
 
-def contacts(request) -> HttpResponse:
-    """Отработка и рендеринг запросов GET и POST страницы контактов"""
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        phone = request.POST.get('phone')
-        email = request.POST.get('email')
-        message = request.POST.get('message')
-        print(f'You have new message from {name}({phone}, {email}): {message}')
-        Contact.objects.create(name=name, phone=phone, email=email, message=message)
-        request.session['last_submission'] = {
-            'name': name,
-            'message': message
+class ContactsView(FormView):
+    template_name = 'catalog/contacts.html'
+    form_class = ContactForm
+    success_url = reverse_lazy('contact_success')
+
+    def get_context_data(self, **kwargs):
+        """Добавление списка контактов в контекст"""
+        context = super().get_context_data(**kwargs)
+        context['contacts'] = Contact.objects.all().order_by('-created_at')
+        return context
+
+    def form_valid(self, form):
+        """Обработка валидной формы"""
+        contact = form.save()
+        self.request.session['last_submission'] = {
+            'name': contact.name,
+            'message': contact.message,
         }
-        return redirect('contact_success')
-    contacts_list = Contact.objects.all().order_by('-created_at')
-    context = {'contacts': contacts_list}
-    return render(request, 'catalog/contacts.html', context)
+        print(f'You have new message from {contact.name}({contact.phone}, {contact.email}): {contact.message}')
+        return super().form_valid(form)
 
 
-def contact_success(request) -> HttpResponse:
-    context = request.session.get('last_submission', {})
-    return render(request, 'catalog/answer_by_message.html', context)
+class AddedProductsView(ListView):
+    model = Product
+    template_name = 'catalog/added_products.html'
+    context_object_name = 'last_products'
+
+    def get_queryset(self):
+        return Product.objects.order_by('-created_at')[:5]
 
 
-def added_products(request) -> HttpResponse:
-    """Последние 5 внесённых в БД продуктов"""
-    last_products = Product.objects.order_by('-created_at')[:5]
-    print("Последние 5 продуктов:", list(last_products.values('id', 'name', 'created_at')))
-    context = {
-        'last_products': last_products,
-    }
-    return render(request, 'catalog/added_products.html', context)
+class ProductDetailView(DetailView):
+    """Визуализация подробностей товара с кастомной обработкой 404"""
+    model = Product
+    template_name = 'catalog/product_details.html'
+    context_object_name = 'product'
+
+    def get(self, request, *args, **kwargs):
+        """Обработка GET-запроса и возможной ошибки 404"""
+        try:
+            self.object = self.get_object()
+            context = self.get_context_data(object=self.object)
+            return self.render_to_response(context)
+        except Http404:
+            context = {
+                'error_title': 'Товар не найден',
+                'error_message': f'Скорее всего товара с номером {kwargs.get("pk")} не существует.',
+            }
+            return render(request, 'catalog/404_custom.html', context, status=404)
 
 
-def product_details(request, pk) -> HttpResponse:
-    try:
-        product = get_object_or_404(Product, id=pk)
-        context = {
-            'product': product,
-        }
-        return render(request, 'catalog/product_details.html', context)
-    except Http404:
-        # Кастомная обработка именно для товаров
-        context = {
-            'error_title': 'Товар не найден',
-            'error_message': f'Скорее всего товара с номером {pk} не существует.',
-        }
-        return render(request, 'catalog/404.html', context, status=404)
+class ProductsByCategoryView(ListView):
+    model = Product
+    template_name = 'catalog/products_by_category.html'
+    context_object_name = 'products'
+
+    def get(self, request, *args, **kwargs):
+        """Ловим 404 на уровне GET, как в ProductDetailView"""
+        try:
+            self.category = get_object_or_404(Category, id=kwargs['category_id'])
+            return super().get(request, *args, **kwargs)
+        except Http404:
+            context = {
+                'error_title': 'Категория не найдена',
+                'error_message': f'Категории с номером {kwargs.get("category_id")} не существует.',
+            }
+            return render(request, 'catalog/404_custom.html', context, status=404)
+
+    def get_queryset(self):
+        return Product.objects.filter(category=self.category)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category'] = self.category
+        return context
 
 
-def products_by_category(request, category_id):
-    """Отображает товары только из указанной категории"""
-    category = get_object_or_404(Category, id=category_id)
-    products = Product.objects.filter(category=category)
-
-    context = {
-        'category': category,
-        'products': products,
-    }
-    return render(request, 'catalog/products_by_category.html', context)
-
-
-def add_product(request):
-    """Добавление товаров пользователем"""
-    if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('added_products')
-    else:
-        form = ProductForm()
-
-    context = {'form': form}
-    return render(request, 'catalog/add_product.html', context)
+class AddProductView(CreateView):
+    form_class = ProductForm
+    template_name = 'catalog/add_product.html'
+    success_url = reverse_lazy('added_products')

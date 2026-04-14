@@ -1,0 +1,9 @@
+<nav class="ms-5">
+    {% if request.path == '/blog/' %}
+        <span class="btn btn-secondary disabled">📝 Главная></span>
+    {% else %}
+        <a class="btn btn-outline-primary" href="{% url 'blog:index' %}">📝 Главная</a>
+    {% endif %}
+    <a class="btn btn-outline-primary" href="{% url 'contacts' %}">📞 Контакты</a>
+    <a class="btn btn-outline-primary" href="{% url 'index' %}">🛒 Перейти в магазин</a>
+</nav>

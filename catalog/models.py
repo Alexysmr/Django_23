@@ -1,7 +1,6 @@
 from django.db import models
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
-from numpy.f2py.crackfortran import verbose
 
 
 class Category(models.Model):
