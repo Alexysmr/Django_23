@@ -25,7 +25,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('catalog.urls')),  # маршруты из приложения catalog
-    path('blog/', include('blog.urls')),  # маршруты из приложения blog
+    path('blog/', include('blog.urls', namespace='blog')),  # маршруты из приложения blog
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
