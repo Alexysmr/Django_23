@@ -1,0 +1,24 @@
+{% extends 'catalog/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h3>Внесение изменений в карточку товара</h3>
+    <form method="post" enctype="multipart/form-data" class="mt-4">
+        {% csrf_token %}
+        <div class="card">
+            <div class="card-body">
+                {{ form.as_p }}
+                {% if product.image %}
+                    <img src="{{ product.image_thumbnail.url }}" class="card-img-top" alt="{{ product.name }}"
+                            style="width: 500px; height: auto;">
+                    {% else %}
+                        <img src="/static/no_image.png" class="card-img-top" alt="">
+                {% endif %}
+                <p></p>
+                <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                <a href="{% url 'catalog:product_details' product.pk %}" class="btn btn-outline-secondary">Отмена</a>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

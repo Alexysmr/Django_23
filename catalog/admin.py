@@ -16,5 +16,5 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Contact)
 class ContactAdmin(admin.ModelAdmin):
-    list_display = ('name', 'email', 'created_at')
-    search_fields = ('name', 'email')
+    list_display = ('username', 'email', 'created_at')
+    search_fields = ('username', 'email')

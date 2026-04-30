@@ -4,6 +4,6 @@
     {% else %}
         <a class="btn btn-outline-primary" href="{% url 'blog:index' %}">📝 Главная</a>
     {% endif %}
-    <a class="btn btn-outline-primary" href="{% url 'contacts' %}">📞 Контакты</a>
-    <a class="btn btn-outline-primary" href="{% url 'index' %}">🛒 Перейти в магазин</a>
+    <a class="btn btn-outline-primary" href="{% url 'catalog:contacts' %}">📞 Контакты</a>
+    <a class="btn btn-outline-primary" href="{% url 'catalog:index' %}">🛒 Перейти в магазин</a>
 </nav>

@@ -15,7 +15,7 @@
                     <div class="card-body">
                         <h2 class="card-title pricing-card-title">{{ product.price }} руб.</h2>
                         <p>{{ product.description|truncatechars:100 }}</p>
-                        <a href="{% url 'product_details' product.id %}" class="btn btn-outline-primary">Подробнее</a>
+                        <a href="{% url 'catalog:product_details' product.id %}" class="btn btn-outline-primary">Подробнее</a>
                     </div>
                 </div>
             </div>
@@ -24,6 +24,6 @@
         {% endfor %}
     </div>
     
-    <a href="{% url 'index' %}" class="btn btn-secondary mt-4">На главную</a>
+    <a href="{% url 'catalog:index' %}" class="btn btn-secondary mt-4">На главную</a>
 </div>
 {% endblock %}

@@ -16,10 +16,10 @@ class Category(models.Model):
 
 
 class Product(models.Model):
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
     name = models.CharField(max_length=100)
     description = models.TextField()
     image = models.ImageField(upload_to='products', blank=True, null=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
     price = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -30,7 +30,6 @@ class Product(models.Model):
         options={'quality': 85}
     )
 
-
     def __str__(self):
         return f'{self.name} - {self.price} руб., {self.category}'
 
@@ -38,15 +37,16 @@ class Product(models.Model):
         verbose_name = 'Продукт'
         verbose_name_plural = 'Продукты'
 
+
 class Contact(models.Model):
-    name = models.CharField(max_length=100, verbose_name='Имя')
+    username = models.CharField(max_length=100, verbose_name='Имя')
     phone = models.CharField(max_length=17, blank=True, null=False, verbose_name='Телефон')
     email = models.EmailField(verbose_name='Email')
     message = models.TextField(verbose_name='Сообщение')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата отправки')
 
     def __str__(self):
-        return f'{self.name} ({self.email})'
+        return f'{self.username} ({self.email})'
 
     class Meta:
         verbose_name = 'Контакт'

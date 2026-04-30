@@ -17,6 +17,8 @@
             <p></p>
             <p><small>Добавлено: {{ product.created_at|date:"d.m.Y H:i" }}</small>,
             <small>Обновлено: {{ product.updated_at|date:"d.m.Y H:i" }}</small></p>
+            <a href="{% url 'catalog:edit' product.pk %}" class="btn btn-outline-primary">Редактировать</a>
+            <a href="{% url 'catalog:delete' product.pk %}" class="btn btn-outline-secondary">Удалить</a>
         </div>
     </div>
 </div>

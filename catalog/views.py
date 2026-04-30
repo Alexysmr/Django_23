@@ -1,9 +1,10 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import Http404
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView,TemplateView
 from django.views.generic.edit import FormView
 from django.urls import reverse_lazy
-from catalog.models import Product, Contact, Category
+
+from .models import Product, Contact, Category
 from .forms import ProductForm, ContactForm
 
 
@@ -21,7 +22,7 @@ class IndexView(ListView):
 class ContactsView(FormView):
     template_name = 'catalog/contacts.html'
     form_class = ContactForm
-    success_url = reverse_lazy('contact_success')
+    success_url = reverse_lazy('catalog:contact_success')
 
     def get_context_data(self, **kwargs):
         """Добавление списка контактов в контекст"""
@@ -33,11 +34,22 @@ class ContactsView(FormView):
         """Обработка валидной формы"""
         contact = form.save()
         self.request.session['last_submission'] = {
-            'name': contact.name,
+            'username': contact.username,
             'message': contact.message,
         }
-        print(f'You have new message from {contact.name}({contact.phone}, {contact.email}): {contact.message}')
+        print(f'You have new message from {contact.username}({contact.phone}, {contact.email}): {contact.message}')
         return super().form_valid(form)
+
+
+class ContactSuccessView(TemplateView):
+    template_name = 'catalog/answer_by_message.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        last_submission = self.request.session.get('last_submission', {})
+        context['username'] = last_submission.get('username', '')
+        context['message'] = last_submission.get('message', '')
+        return context
 
 
 class AddedProductsView(ListView):
@@ -69,6 +81,16 @@ class ProductDetailView(DetailView):
             return render(request, 'catalog/404_custom.html', context, status=404)
 
 
+class ProductEditView(UpdateView):
+    model = Product
+    form_class = ProductForm
+    template_name = 'catalog/product_update.html'
+    context_object_name = 'product'
+
+    def get_success_url(self):
+        return reverse_lazy('catalog:product_details', kwargs={'pk': self.object.pk})
+
+
 class ProductsByCategoryView(ListView):
     model = Product
     template_name = 'catalog/products_by_category.html'
@@ -98,4 +120,11 @@ class ProductsByCategoryView(ListView):
 class AddProductView(CreateView):
     form_class = ProductForm
     template_name = 'catalog/add_product.html'
-    success_url = reverse_lazy('added_products')
+    success_url = reverse_lazy('catalog:added_products')
+
+
+class DeleteProductView(DeleteView):
+    model = Product
+    template_name = 'catalog/product_delete.html'
+    context_object_name = 'product'
+    success_url = reverse_lazy('catalog:index')
