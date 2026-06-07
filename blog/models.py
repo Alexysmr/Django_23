@@ -1,11 +1,13 @@
 from django.db import models
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
+from django.conf import settings
 
 
 class BlogPost(models.Model):
     title = models.CharField(max_length=200)
     content = models.TextField()
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='posts')
     preview = models.ImageField(upload_to='blog', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     published = models.BooleanField(default=False)

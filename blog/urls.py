@@ -9,5 +9,4 @@ urlpatterns = [
     path('detail/<int:pk>/', views.PostDetailView.as_view(), name='details'),
     path('edit/<int:pk>/', views.PostEditView.as_view(), name='edit'),
     path('delete/<int:pk>/', views.PostDeleteView.as_view(), name='delete'),
-    path('toggle_mode', views.ToggleModeView.as_view(), name='toggle_mode'),
     ]

@@ -1,6 +1,6 @@
 from django.db import models
 
-FORBIDDEN_WORDS = [  # запрещённые к вводу в нарточку товара слова
+FORBIDDEN_WORDS = [  # запрещённые к вводу в карточку товара слова
     'казино', 'криптовалюта', 'крипта', 'биржа',
     'дешево', 'бесплатно', 'обман', 'полиция', 'радар'
     ]
@@ -23,4 +23,11 @@ REPLACEMENT_PLACEHOLDERS = {  # замена подсказок для поль�
     'price': 'цену в руб.',
     'username': 'имя',
     'phone': 'номер телефона'
+    }
+
+CATALOG_GROUP_LIST = ['Модератор продуктов']
+
+FIXTURES_DICT = {  # словарь для создания фикстур пользователей и данных БД проекта
+    'first_load_users_groups.json' : ['auth.Group', 'auth.User'],
+    'second_load_apps_data.json' : ['catalog', 'blog']
     }

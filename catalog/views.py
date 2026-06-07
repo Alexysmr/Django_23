@@ -1,11 +1,24 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.contrib.auth.views import LoginView
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.http import Http404
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView,TemplateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView,TemplateView, RedirectView
 from django.views.generic.edit import FormView
 from django.urls import reverse_lazy
 
+from auxiliary.utils import user_in_groups
+from auxiliary.constants import CATALOG_GROUP_LIST
 from .models import Product, Contact, Category
 from .forms import ProductForm, ContactForm
+
+
+class CustomPermissionMixin(PermissionRequiredMixin):
+    def handle_no_permission(self):
+        if not self.request.user.is_authenticated:
+            return super().handle_no_permission()
+        messages.error(self.request, "Для совершения данного действия требуются права администратора")
+        return redirect('catalog:index')
 
 
 class IndexView(ListView):
@@ -17,6 +30,11 @@ class IndexView(ListView):
     def get_queryset(self):
         # Метод можно не добавлять, но в случае возникновения необходимости предварительной обработки пригодится
         return Product.objects.all().order_by('created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_moderator_products'] = user_in_groups(self.request.user, CATALOG_GROUP_LIST)
+        return context
 
 
 class ContactsView(FormView):
@@ -52,7 +70,7 @@ class ContactSuccessView(TemplateView):
         return context
 
 
-class AddedProductsView(ListView):
+class AddedProductsView(LoginRequiredMixin, ListView):
     model = Product
     template_name = 'catalog/added_products.html'
     context_object_name = 'last_products'
@@ -75,13 +93,13 @@ class ProductDetailView(DetailView):
             return self.render_to_response(context)
         except Http404:
             context = {
-                'error_title': 'Товар не найден',
-                'error_message': f'Скорее всего товара с номером {kwargs.get("pk")} не существует.',
+                'error_title': 'Ошибка запрашиваемой страницы',
+                'error_message': f'Скорее всего того, что Вы задали в адресной строке, на этом сайте не существует.',
             }
             return render(request, 'catalog/404_custom.html', context, status=404)
 
 
-class ProductEditView(UpdateView):
+class ProductEditView(LoginRequiredMixin, UpdateView):
     model = Product
     form_class = ProductForm
     template_name = 'catalog/product_update.html'
@@ -89,6 +107,13 @@ class ProductEditView(UpdateView):
 
     def get_success_url(self):
         return reverse_lazy('catalog:product_details', kwargs={'pk': self.object.pk})
+
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.owner != request.user and not request.user.has_perm('catalog.change_product'):
+            messages.error(request, "Редактировать можно только свои продукты.")
+            return redirect('catalog:product_details', pk=obj.pk)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class ProductsByCategoryView(ListView):
@@ -103,8 +128,8 @@ class ProductsByCategoryView(ListView):
             return super().get(request, *args, **kwargs)
         except Http404:
             context = {
-                'error_title': 'Категория не найдена',
-                'error_message': f'Категории с номером {kwargs.get("category_id")} не существует.',
+                'error_title': 'Ошибка запрашиваемой страницы',
+                'error_message': f'Скорее всего того, что Вы задали в адресной строке, на этом сайте не существует.',
             }
             return render(request, 'catalog/404_custom.html', context, status=404)
 
@@ -117,14 +142,38 @@ class ProductsByCategoryView(ListView):
         return context
 
 
-class AddProductView(CreateView):
+class AddProductView(LoginRequiredMixin, CustomPermissionMixin, CreateView):
     form_class = ProductForm
     template_name = 'catalog/add_product.html'
+    permission_required = 'catalog.add_product'
     success_url = reverse_lazy('catalog:added_products')
 
+    def form_valid(self, form):
+        product = form.save(commit=False)
+        product.owner = self.request.user
+        product.save()
+        return super().form_valid(form)
 
-class DeleteProductView(DeleteView):
+
+class DeleteProductView(LoginRequiredMixin, CustomPermissionMixin, DeleteView):
     model = Product
     template_name = 'catalog/product_delete.html'
     context_object_name = 'product'
+    permission_required = 'catalog.delete_product'
     success_url = reverse_lazy('catalog:index')
+
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.owner != request.user and not request.user.has_perm('catalog.delete_product'):
+            messages.error(request, "Удалять продукты могут только владелец или модератор.")
+            return redirect('catalog:product_details', pk=obj.pk)
+        return super().dispatch(request, *args, **kwargs)
+
+
+class CustomLoginView(LoginView):
+    template_name = 'registration/login.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['next'] = self.request.GET.get('next', '')
+        return context

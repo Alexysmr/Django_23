@@ -14,10 +14,13 @@
                     <img src="/static/no_image.png" class="card-img-top" alt="">
             {% endif %}
             <p><strong>Содержание:</strong> {{ post.content|linebreaks }}</p>
-            <p></p>
-            {% if admin_mode %}
-            <a href="{% url 'blog:edit' post.pk %}" class="btn btn-outline-primary">Редактировать</a>
-            <a href="{% url 'blog:delete' post.pk %}" class="btn btn-outline-primary">Удалить</a>
+            <p>{{ user }}, {{ post.owner }}</p>
+                <a href="{% url 'blog:index' %}" class="btn btn-primary">На главную блога</a>
+            {% if perms.blog.change_blogpost or user == post.owner %}
+                <a href="{% url 'blog:edit' post.pk %}" class="btn btn-outline-primary">Редактировать</a>
+            {% endif %}
+            {% if perms.blog.delete_blogpost or user == post.owner %}
+                <a href="{% url 'blog:delete' post.pk %}" class="btn btn-outline-primary">Удалить</a>
             {% endif %}
         </div>
     </div>

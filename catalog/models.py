@@ -1,6 +1,7 @@
 from django.db import models
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
+from django.conf import settings
 
 
 class Category(models.Model):
@@ -21,6 +22,8 @@ class Product(models.Model):
     description = models.TextField()
     image = models.ImageField(upload_to='products', blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='products')
+    is_published = models.BooleanField(default=False, verbose_name='Опубликован')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     image_thumbnail = ImageSpecField(
@@ -36,6 +39,9 @@ class Product(models.Model):
     class Meta:
         verbose_name = 'Продукт'
         verbose_name_plural = 'Продукты'
+        permissions = [
+            ('can_unpublish_product', 'can_unpublish_product'),
+        ]
 
 
 class Contact(models.Model):

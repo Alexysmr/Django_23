@@ -1,11 +1,13 @@
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, RedirectView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from django.core.mail import send_mail
-from django.conf import settings
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
+from django.shortcuts import redirect
+from django.db.models import Q
 
 from blog.models import BlogPost
 from blog.forms import BlogPostForm
-from .utils import send_100_views_congratulation
+from auxiliary.utils import send_100_views_congratulation
 
 
 class BlogView(ListView):
@@ -15,29 +17,29 @@ class BlogView(ListView):
     paginate_by = 3
 
     def get_queryset(self):
-        admin_mode = self.request.session.get('admin_mode', False)
-        if admin_mode:
+        if not self.request.user.is_authenticated:
+            return BlogPost.objects.filter(published=True).order_by('created_at')
+        if self.request.user.has_perm('blog.change_blogpost'):
             return BlogPost.objects.all().order_by('created_at')
-        return BlogPost.objects.filter(published=True).order_by('created_at')
+        if self.request.user.is_authenticated:
+            return BlogPost.objects.filter(Q(published=True) | Q(owner=self.request.user))
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['admin_mode'] = self.request.session.get('admin_mode', False)
-        return context
+
 
 class PostDetailView(DetailView):
-    """Возвращает пост, увеличивает счётчик просмотров.
-    При достижении 100 просмотров отправляет уведомление автору.
-    В режиме 'Посетитель' черновики недоступны (фильтруются в get_queryset).
-    """
+    """Возвращает посты, увеличивает счётчик просмотров.
+    При достижении 100 просмотров отправляет уведомление автору."""
     model = BlogPost
     template_name = 'blog/post_details.html'
     context_object_name = 'post'
 
     def get_queryset(self):
-        admin_mode = self.request.session.get('admin_mode', False)
-        if admin_mode:
+        if self.request.user.has_perm('blog.change_blogpost'):
             return BlogPost.objects.all()
+        if self.request.user.is_authenticated:
+            return BlogPost.objects.filter(
+                Q(published=True) | Q(owner=self.request.user)
+            )
         return BlogPost.objects.filter(published=True)
 
     def get_object(self, queryset=None):
@@ -51,18 +53,20 @@ class PostDetailView(DetailView):
                 send_100_views_congratulation(obj)
         return obj
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['admin_mode'] = self.request.session.get('admin_mode', False)
-        return context
 
-class PostCreateView(CreateView):
+class PostCreateView(LoginRequiredMixin, CreateView):
     model = BlogPost
     form_class = BlogPostForm
-    template_name = 'blog/post_create.html'
     success_url = reverse_lazy('blog:index')
 
-class PostEditView(UpdateView):
+    def form_valid(self, form):
+        product = form.save(commit=False)
+        product.owner = self.request.user
+        product.save()
+        return super().form_valid(form)
+
+
+class PostEditView(LoginRequiredMixin, UpdateView):
     model = BlogPost
     form_class = BlogPostForm
     template_name = 'blog/post_update.html'
@@ -71,16 +75,23 @@ class PostEditView(UpdateView):
     def get_success_url(self):
         return reverse_lazy('blog:details', kwargs={'pk': self.object.pk})
 
-class PostDeleteView(DeleteView):
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.owner != request.user and not request.user.has_perm('blog.change_blogpost'):
+            messages.error(request, "Чтобы редактировать нужно иметь соответствующие права.")
+            return redirect('blog:index')
+        return super().dispatch(request, *args, **kwargs)
+
+
+class PostDeleteView(LoginRequiredMixin, DeleteView):
     model = BlogPost
     template_name = 'blog/post_delete.html'
     context_object_name = 'post'
     success_url = reverse_lazy('blog:index')
 
-class ToggleModeView(RedirectView):
-    url = reverse_lazy('blog:index')
-
-    def get(self, request, *args, **kwargs):
-        current = request.session.get('admin_mode', False)
-        request.session['admin_mode'] = not current
-        return super().get(request, *args, **kwargs)
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.owner != request.user and not request.user.has_perm('blog.delete_blogpost'):
+            messages.error(request, "Чтобы удалять нужно иметь соответствующие права.")
+            return redirect('blog:index')
+        return super().dispatch(request, *args, **kwargs)

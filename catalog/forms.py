@@ -1,7 +1,7 @@
 from django import forms
 
 from .models import Product, Contact
-from .constant import FORBIDDEN_WORDS, TYPE_OF_IMAGE, MAX_IMAGE_SIZE_BYTES, FIELD_ATTRIBUTES, REPLACEMENT_PLACEHOLDERS
+from auxiliary.constants import FORBIDDEN_WORDS, TYPE_OF_IMAGE, MAX_IMAGE_SIZE_BYTES, FIELD_ATTRIBUTES, REPLACEMENT_PLACEHOLDERS
 
 
 class BootstrapFormMixin:

@@ -18,13 +18,18 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from catalog.views import CustomLoginView
+from django.contrib.auth.views import LogoutView
 
 
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('catalog.urls')),  # маршруты из приложения catalog
+    path('accounts/login/', CustomLoginView.as_view(), name='login'),
+    path('accounts/logout/', LogoutView.as_view(next_page='/'), name='logout'),
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('', include('catalog.urls', namespace='catalog')),  # маршруты из приложения catalog
     path('blog/', include('blog.urls', namespace='blog')),  # маршруты из приложения blog
 ]
 if settings.DEBUG:
