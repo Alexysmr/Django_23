@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Product, Contact
+from .models import Product
 from auxiliary.constants import FORBIDDEN_WORDS, TYPE_OF_IMAGE, MAX_IMAGE_SIZE_BYTES, FIELD_ATTRIBUTES, REPLACEMENT_PLACEHOLDERS
 
 
@@ -65,22 +65,9 @@ class ProductForm(BootstrapFormMixin, forms.ModelForm):
         image = self.cleaned_data.get('image')
         if not image:
             return image
-        new_file = hasattr(image, 'content_type')
-        if new_file:
-            if image.size > MAX_IMAGE_SIZE_BYTES:
-                raise forms.ValidationError(f'Файл не более {MAX_IMAGE_SIZE_BYTES // 1048576} МБ')
-            if image.content_type not in [f'image/{fmt.lower()}' for fmt in TYPE_OF_IMAGE]:
-                raise forms.ValidationError(f'Допустимы только {", ".join(TYPE_OF_IMAGE)}.')
-            return image
-
-
-class ContactForm(BootstrapFormMixin, forms.ModelForm):
-    class Meta:
-        model = Contact
-        fields = ['username', 'phone', 'email', 'message']
-        labels = {
-            'username': 'Ваше имя',
-            'phone': 'Телефон',
-            'email': 'Email',
-            'message': 'Сообщение',
-        }
+        if image.size > MAX_IMAGE_SIZE_BYTES:
+            raise forms.ValidationError(f'Файл не более {MAX_IMAGE_SIZE_BYTES // 1048576} МБ')
+        ext = image.name.split('.')[-1].lower()
+        if ext not in [fmt.lower() for fmt in TYPE_OF_IMAGE]:
+            raise forms.ValidationError(f'Допустимы только {", ".join(TYPE_OF_IMAGE)}.')
+        return image

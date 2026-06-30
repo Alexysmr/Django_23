@@ -28,7 +28,7 @@
   "pk": 1,
   "fields": {
     "password": "pbkdf2_sha256$1200000$ci50mwGUvjkd2hZ3EWtPRT$Uzv3igIHx0xC+OH14e6P1u4Ht4AHeoFgm3w3VOP3lcE=",
-    "last_login": "2026-06-04T11:16:32.733Z",
+    "last_login": "2026-06-23T15:18:36Z",
     "is_superuser": true,
     "username": "superviser",
     "first_name": "",
@@ -37,18 +37,10 @@
     "is_staff": true,
     "is_active": true,
     "date_joined": "2026-05-22T10:21:16Z",
-    "groups": [],
-    "user_permissions": [
-      38,
-      39,
-      40,
-      41,
-      29,
-      33,
-      30,
-      31,
-      32
-    ]
+    "groups": [
+      2
+    ],
+    "user_permissions": []
   }
 },
 {

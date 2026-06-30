@@ -1,5 +1,5 @@
 from django.contrib import admin
-from catalog.models import Category, Product, Contact
+from catalog.models import Category, Product
 
 
 @admin.register(Category)
@@ -24,7 +24,7 @@ class ProductAdmin(admin.ModelAdmin):
         return request.user.has_perm('catalog.can_unpublish_product')
 
 
-@admin.register(Contact)
-class ContactAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'created_at')
-    search_fields = ('username', 'email')
+# @admin.register(Contact)
+# class ContactAdmin(admin.ModelAdmin):
+#     list_display = ('username', 'email', 'created_at')
+#     search_fields = ('username', 'email')

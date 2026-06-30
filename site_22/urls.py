@@ -22,15 +22,15 @@ from catalog.views import CustomLoginView
 from django.contrib.auth.views import LogoutView
 
 
-
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/login/', CustomLoginView.as_view(), name='login'),
     path('accounts/logout/', LogoutView.as_view(next_page='/'), name='logout'),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('', include('catalog.urls', namespace='catalog')),  # маршруты из приложения catalog
+    path('', include('hub.urls', namespace='hub')),  # маршруты из приложения hub
+    path('catalog/', include('catalog.urls', namespace='catalog')),  # маршруты из приложения catalog
     path('blog/', include('blog.urls', namespace='blog')),  # маршруты из приложения blog
+    path('contacts/', include('contacts.urls', namespace='contacts')), # маршруты из приложения contacts
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

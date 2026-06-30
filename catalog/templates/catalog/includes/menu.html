@@ -1,14 +1,10 @@
 <nav class="ms-5">
-    {% if request.path == '/' %}
-    <span class="p-2 btn btn-secondary disabled">Каталог</span>
-    {% else %}
-    <a class="p-2 btn btn-outline-primary" href="/">Каталог</a>
-    {% endif %}
+    <a class="p-2 btn btn-outline-primary" href="/">На главную</a>
 
-    {% if request.path == '/contacts/' %}
-        <span class="p-2 btn btn-secondary disabled">Контакты</span>
+    {% if is_catalog_home %}
+        <span class="p-2 btn btn-secondary disabled">Каталог</span>
     {% else %}
-        <a class="p-2 btn btn-outline-primary" href="/contacts/">Контакты</a>
+        <a class="p-2 btn btn-outline-primary" href="{% url 'catalog:index' %}">Каталог</a>
     {% endif %}
 
     {% if perms.catalog.add_product %}
@@ -19,7 +15,6 @@
         {% endif %}
     {% endif %}
 
-
     {% if user.is_authenticated %}
         {% if request.path == '/added_products/' %}
             <span class="p-2 btn btn-secondary disabled">Последние 5 добавленных товаров</span>
@@ -27,5 +22,7 @@
             <a class="p-2 btn btn-outline-primary" href="/added_products/">Последние 5 добавленных товаров</a>
         {% endif %}
     {% endif %}
-    <a class="btn btn-outline-primary" href="{% url 'blog:index' %}">📝 Перейти в блог</a>
+
+    <a class="btn btn-outline-primary" href="{% url 'blog:index' %}">📝 Блог</a>
+    <a class="btn btn-outline-primary" href="{% url 'contacts:index' %}">📞 Контакты</a>
 </nav>

@@ -6,7 +6,7 @@ FORBIDDEN_WORDS = [  # запрещённые к вводу в карточку 
     ]
 
 MAX_IMAGE_SIZE_BYTES = 5242880  # Максимальный размер загружаемого файла изображения в карточку товара в байтах
-TYPE_OF_IMAGE = ['JPEG', 'PNG']  # Допустимый формат загружаемого файла изображения в карточку товара
+TYPE_OF_IMAGE = ['JPEG', 'JPG', 'PNG']  # Допустимый формат загружаемого файла изображения в карточку товара
 
 FIELD_ATTRIBUTES = {  # Настройка атрибутов в соответствии типам полей
     models.CharField: {'class': 'form-control', 'placeholder': 'текст'},
@@ -27,7 +27,17 @@ REPLACEMENT_PLACEHOLDERS = {  # замена подсказок для поль�
 
 CATALOG_GROUP_LIST = ['Модератор продуктов']
 
-FIXTURES_DICT = {  # словарь для создания фикстур пользователей и данных БД проекта
+FIXTURES_DICT = {  # словарь для создания фикстур пользователей и данных БД приложений проекта
     'first_load_users_groups.json' : ['auth.Group', 'auth.User'],
-    'second_load_apps_data.json' : ['catalog', 'blog']
+    'second_load_apps_data.json' : ['catalog', 'blog', 'contacts', 'hub']
     }
+
+PORTAL_APPS = [
+    {'name': 'Магазин', 'url': 'catalog:index', 'icon': '🛒'},
+    {'name': 'Блог', 'url': 'blog:index', 'icon': '📝'},
+    {'name': 'Контакты', 'url': 'contacts:index', 'icon': '✉️'},
+]
+
+CACHE_KEY_PRODUCT_LIST_MODERATOR = 'product_list_moderator'
+CACHE_KEY_PRODUCT_LIST_OWNER = 'product_list_owner'
+CACHE_KEY_PRODUCT_LIST_PUBLIC = 'product_list_public'
