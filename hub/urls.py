@@ -5,5 +5,5 @@ from . import views
 app_name = 'hub'
 
 urlpatterns = [
-    path('', cache_page(60 * 60 * 12)(views.HubView.as_view()), name='hub'),
+    path('', views.HubView.as_view(), name='hub'),
 ]
