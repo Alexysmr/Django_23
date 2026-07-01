@@ -1,0 +1,104 @@
+[
+{
+  "model": "auth.group",
+  "pk": 1,
+  "fields": {
+    "name": "Модератор продуктов",
+    "permissions": [
+      33,
+      31,
+      32
+    ]
+  }
+},
+{
+  "model": "auth.group",
+  "pk": 2,
+  "fields": {
+    "name": "Контент-менеджер",
+    "permissions": [
+      39,
+      40,
+      41
+    ]
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$ci50mwGUvjkd2hZ3EWtPRT$Uzv3igIHx0xC+OH14e6P1u4Ht4AHeoFgm3w3VOP3lcE=",
+    "last_login": "2026-06-23T15:18:36Z",
+    "is_superuser": true,
+    "username": "superviser",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-05-22T10:21:16Z",
+    "groups": [
+      2
+    ],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$rxxvZYlabOYXYxb2ddRnER$Nt1tXbjI0ST3M5HaL6uxtf9R+RXkj6NRY8zknKe8kS8=",
+    "last_login": "2026-06-04T11:13:53.345Z",
+    "is_superuser": false,
+    "username": "moderator_products",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-05-22T10:23:40Z",
+    "groups": [
+      1
+    ],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$p3pXKLAD7TxREBAKePpMjK$OVExfXv5whmx0v0Gg93ITvwKCW5RXMMOhVdwPrZmbNA=",
+    "last_login": "2026-06-04T11:19:28.958Z",
+    "is_superuser": false,
+    "username": "bloger",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-06-02T07:33:30Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 4,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$pSVliRVOieRWdxj9iyIEcU$drK3Rh7AW3ngOLALR7Xq1q5dDRWyNrPVEC7MAq7rj18=",
+    "last_login": "2026-06-04T11:14:19.127Z",
+    "is_superuser": false,
+    "username": "content-manager",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-06-03T11:43:14Z",
+    "groups": [
+      2
+    ],
+    "user_permissions": []
+  }
+}
+]

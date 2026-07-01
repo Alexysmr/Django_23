@@ -1,0 +1,21 @@
+{% extends 'shared_code.html' %}
+
+{% block title %}SkyPro Store{% endblock %}
+{% block site_title %}SkyPro Store{% endblock %}
+{% block menu %}
+    {% include 'catalog/includes/menu.html' %}
+{% endblock %}
+
+{% block content %}
+{% endblock %}
+{% block footer_categories %}
+    <h5>Категории</h5>
+    <ul class="list-unstyled text-small">
+        {% for category in all_categories %}
+        <p>
+            <a href="{% url 'catalog:products_by_category' category.id %}" class="text-muted">
+                {{ category.name }}</a>
+        </p>
+        {% endfor %}
+    </ul>
+{% endblock %}

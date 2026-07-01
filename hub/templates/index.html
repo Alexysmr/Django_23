@@ -1,0 +1,15 @@
+{% extends 'shared_code.html' %}
+
+{% block content %}
+<div class="text-center mt-5">
+    <h1>Добро пожаловать!</h1>
+    <p>Выберите раздел:</p>
+    <div class="d-flex justify-content-center gap-3">
+        {% for app in apps %}
+            <a href="{% url app.url %}" class="btn btn-lg btn-outline-primary">
+                {{ app.icon }} {{ app.name }}
+            </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

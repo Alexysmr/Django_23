@@ -1,0 +1,10 @@
+<nav class="ms-5">
+    <a class="p-2 btn btn-outline-primary" href="/">На главную</a>
+    <a class="btn btn-outline-primary" href="{% url 'catalog:index' %}">🛒 Магазин</a>
+    {% if request.path == '/blog/' %}
+        <span class="btn btn-secondary disabled">📝 Блог</span>
+    {% else %}
+        <a class="btn btn-outline-primary" href="{% url 'blog:index' %}">📝 Блог</a>
+    {% endif %}
+    <a class="btn btn-outline-primary" href="{% url 'contacts:index' %}">📞 Контакты</a>
+</nav>

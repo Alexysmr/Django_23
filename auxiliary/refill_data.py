@@ -14,6 +14,7 @@ Product.objects.all().delete()
 cat1 = Category.objects.create(name='Электроника', description='Гаджеты и устройства')
 cat2 = Category.objects.create(name='Книги', description='Художественная и техническая литература')
 cat3 = Category.objects.create(name='Одежда', description='Мужская и женская одежда')
+cat4 = Category.objects.create(name='ЭМИ', description='Электро-музыкальные инструменты')
 
 Product.objects.create(
     name='Ноутбук Lenovo',
@@ -33,5 +34,18 @@ Product.objects.create(
     category=cat2,
     price=1500.00
 )
+Product.objects.create(
+    name='Электрогитара',
+    description='Электрогитара 6-ти струнная, H-H, тремоло Floyd Rose, Volume, Tone',
+    category=cat4,
+    price=15000.00
+)
+Product.objects.create(
+    name='Wah-wah педаль',
+    description='Педаль эффектов Wah-wah, VOX модель V847A "Cry baby"',
+    category=cat4,
+    price=8000.00
+)
+
 
 print('Данные созданы заново')
